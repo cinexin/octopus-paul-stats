@@ -7,6 +7,11 @@ from infrastructure.cache import cache, _MatchCache
 from infrastructure.betexplorer_repository import BetExplorerRepository
 
 
+@pytest.fixture(autouse=True)
+def _dont_mock_cache():
+    yield
+
+
 class TestRedisCache:
     def setup_method(self):
         self.repo = BetExplorerRepository()

@@ -6,8 +6,9 @@ try:
     import redis as redis_lib
 
     _redis_available = True
-except ImportError:
+except ImportError as e:
     _redis_available = False
+    _redis_import_error = str(e)
 
 logger = logging.getLogger(__name__)
 
@@ -18,59 +19,76 @@ _REDIS_URL = 'redis://localhost:6379/0'
 class _MatchCache:
     def __init__(self):
         self._client = None
-        if _redis_available:
-            try:
-                self._client = redis_lib.from_url(
-                    _REDIS_URL,
-                    decode_responses=True,
-                    socket_connect_timeout=2,
-                    socket_timeout=2,
-                )
-                self._client.ping()
-                logger.info('Redis connected at %s', _REDIS_URL)
-            except Exception as e:
-                logger.warning('Redis unavailable, cache disabled: %s', e)
-                self._client = None
+        self._status_logged = False
+        self._connect()
+
+    def _connect(self):
+        if not _redis_available:
+            return
+        try:
+            client = redis_lib.from_url(
+                _REDIS_URL,
+                decode_responses=True,
+                socket_connect_timeout=2,
+                socket_timeout=2,
+            )
+            client.ping()
+            self._client = client
+        except Exception as e:
+            self._client = None
+
+    _status_logged = False
+
+    def _ensure_connected(self):
+        if self._client is not None:
+            return True
+        if self._status_logged:
+            return False
+        self._connect()
+        self._status_logged = True
+        if self._client is not None:
+            logger.info('Caché Redis activo en %s', _REDIS_URL)
+        else:
+            logger.warning('Redis no disponible — las estadísticas se obtendrán de BetExplorer sin caché')
+        return self._client is not None
 
     @property
     def enabled(self):
         return self._client is not None
 
     def get(self, key):
-        if not self._client:
+        if not self._ensure_connected():
             return None
         try:
             data = self._client.get(key)
             if data is None:
                 return None
-            logger.info('Cache hit for key %s', key)
             return json.loads(data)
         except Exception as e:
             logger.error('Cache get error for key %s: %s', key, e)
+            self._client = None
             return None
 
     def set(self, key, value, ttl=_DEFAULT_TTL):
-        if not self._client:
+        if not self._ensure_connected():
             return
         try:
             self._client.setex(key, ttl, json.dumps(value))
         except Exception as e:
             logger.error('Cache set error for key %s: %s', key, e)
+            self._client = None
 
     def clear(self, key):
-        if not self._client:
+        if not self._ensure_connected():
             return
         try:
             self._client.delete(key)
         except Exception as e:
             logger.error('Cache clear error for key %s: %s', key, e)
+            self._client = None
 
 
 cache = _MatchCache()
-if not cache.enabled:
-    logger.warning('Cache disabled — Redis no disponible. Las estadísticas se obtendrán de BetExplorer en cada petición.')
-else:
-    logger.info('Caché Redis activo en %s', _REDIS_URL)
 
 
 def _latest_match_date(matches):
