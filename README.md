@@ -39,6 +39,12 @@ python -m main "Francia" "Inglaterra" 10
 
 El proyecto incluye una API REST construida con **FastAPI** con documentación Swagger interactiva.
 
+### Redis (caché)
+
+```bash
+docker compose up -d
+```
+
 ### Arrancar el servidor
 
 ```bash
@@ -193,6 +199,7 @@ octopus-paul-stats/
 │   ├── container.py                       # Contenedor DI (AppContainer con providers)
 │   └── cli.py                             # Orquestación: fetch → compute H2H → probabilities → display
 │
+├── docker-compose.yml                     # Redis local para caché
 ├── octopus-paul-stats.spec                # Configuración de PyInstaller
 ├── requirements.txt
 └── tests/
