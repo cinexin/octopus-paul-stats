@@ -3,9 +3,29 @@ services:
     image: redis:7-alpine
     container_name: octopus-paul-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli${REDIS_PASSWORD:+ -a }${REDIS_PASSWORD} ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    command: >
+      redis-server --appendonly yes
+      ${REDIS_PASSWORD:+--requirepass }${REDIS_PASSWORD}
+
+  api:
+    build: .
+    container_name: octopus-paul-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      REDIS_URL: "redis://${REDIS_PASSWORD:+:}${REDIS_PASSWORD}${REDIS_PASSWORD:+@}redis:${REDIS_PORT:-6379}/0"
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

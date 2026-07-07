@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from datetime import datetime
 
 try:
@@ -13,7 +14,7 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 _DEFAULT_TTL = 3600
-_REDIS_URL = 'redis://localhost:6379/0'
+_REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 
 
 class _MatchCache:
