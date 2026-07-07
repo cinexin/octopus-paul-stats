@@ -43,6 +43,7 @@ class _MatchCache:
             data = self._client.get(key)
             if data is None:
                 return None
+            logger.info('Cache hit for key %s', key)
             return json.loads(data)
         except Exception as e:
             logger.error('Cache get error for key %s: %s', key, e)
@@ -66,6 +67,10 @@ class _MatchCache:
 
 
 cache = _MatchCache()
+if not cache.enabled:
+    logger.warning('Cache disabled — Redis no disponible. Las estadísticas se obtendrán de BetExplorer en cada petición.')
+else:
+    logger.info('Caché Redis activo en %s', _REDIS_URL)
 
 
 def _latest_match_date(matches):

@@ -205,7 +205,6 @@ class BetExplorerRepository:
         ck = cache_key(team_url, tournament_filter)
         cached = cache.get(ck)
         if cached is not None and is_cache_fresh(cached):
-            logger.info('Cache hit for %s', ck)
             return [self._match_from_dict(m) for m in cached['matches']]
 
         logger.info('Cache miss or stale for %s, fetching...', ck)
