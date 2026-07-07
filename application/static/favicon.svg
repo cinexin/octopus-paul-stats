@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="head" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ff9966"/>
+      <stop offset="100%" stop-color="#ff6600"/>
+    </radialGradient>
+    <radialGradient id="ball" cx="40%" cy="35%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cccccc"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Tentacles -->
+  <path d="M25 65 Q10 80 15 95 Q18 100 22 95 Q25 85 30 70" fill="#ff6600" stroke="#cc5500" stroke-width="1"/>
+  <path d="M35 70 Q25 88 28 98 Q30 102 34 97 Q36 85 40 72" fill="#ff6600" stroke="#cc5500" stroke-width="1"/>
+  <path d="M45 72 Q40 90 42 100 Q44 103 47 98 Q48 88 50 74" fill="#ff6600" stroke="#cc5500" stroke-width="1"/>
+  <path d="M55 72 Q58 90 56 100 Q54 103 52 98 Q52 88 50 74" fill="#ff6600" stroke="#cc5500" stroke-width="1"/>
+  <path d="M65 70 Q75 88 72 98 Q70 102 66 97 Q64 85 60 72" fill="#ff6600" stroke="#cc5500" stroke-width="1"/>
+  <path d="M75 65 Q90 80 85 95 Q82 100 78 95 Q75 85 70 70" fill="#ff6600" stroke="#cc5500" stroke-width="1"/>
+
+  <!-- Head -->
+  <ellipse cx="50" cy="45" rx="28" ry="25" fill="url(#head)" stroke="#cc5500" stroke-width="1.5"/>
+
+  <!-- Eyes -->
+  <ellipse cx="40" cy="40" rx="6" ry="7" fill="white"/>
+  <ellipse cx="60" cy="40" rx="6" ry="7" fill="white"/>
+  <circle cx="41" cy="40" r="3.5" fill="#333"/>
+  <circle cx="61" cy="40" r="3.5" fill="#333"/>
+  <circle cx="42" cy="38" r="1.5" fill="white"/>
+  <circle cx="62" cy="38" r="1.5" fill="white"/>
+
+  <!-- Mouth (funny smile) -->
+  <path d="M42 52 Q50 60 58 52" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Cheeks -->
+  <ellipse cx="34" cy="50" rx="4" ry="3" fill="#ff4444" opacity="0.3"/>
+  <ellipse cx="66" cy="50" rx="4" ry="3" fill="#ff4444" opacity="0.3"/>
+
+  <!-- Soccer ball on top -->
+  <circle cx="50" cy="18" r="12" fill="url(#ball)" stroke="#999" stroke-width="1"/>
+  <!-- Pentagon pattern -->
+  <polygon points="50,10 54,13 53,18 47,18 46,13" fill="#333" stroke="#333" stroke-width="0.5"/>
+  <line x1="50" y1="10" x2="50" y2="7" stroke="#999" stroke-width="1.5"/>
+</svg>

@@ -1,6 +1,8 @@
 import logging
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 
 from application.container import AppContainer
 from application.schemas import (
@@ -42,11 +44,18 @@ def _compute_h2h(stats, team1_name, team2_name):
     return t1_avg, t2_avg
 
 
+_FAVICON_PATH = Path(__file__).parent / 'static' / 'favicon.svg'
+
 app = FastAPI(
     title='Octopus Paul Stats API',
     description='Calcula probabilidades de partidos de fútbol usando distribución de Poisson con datos extraídos de BetExplorer.',
     version='1.0.0',
 )
+
+
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse(_FAVICON_PATH)
 
 
 @app.get(
