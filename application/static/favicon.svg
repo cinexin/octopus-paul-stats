@@ -4,10 +4,9 @@
       <stop offset="0%" stop-color="#ff9966"/>
       <stop offset="100%" stop-color="#ff6600"/>
     </radialGradient>
-    <radialGradient id="ball" cx="40%" cy="35%" r="50%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#cccccc"/>
-    </radialGradient>
+    <clipPath id="ballClip">
+      <circle cx="50" cy="18" r="13"/>
+    </clipPath>
   </defs>
 
   <!-- Tentacles -->
@@ -36,9 +35,24 @@
   <ellipse cx="34" cy="50" rx="4" ry="3" fill="#ff4444" opacity="0.3"/>
   <ellipse cx="66" cy="50" rx="4" ry="3" fill="#ff4444" opacity="0.3"/>
 
-  <!-- Soccer ball on top -->
-  <circle cx="50" cy="18" r="12" fill="url(#ball)" stroke="#999" stroke-width="1"/>
-  <!-- Pentagon pattern -->
-  <polygon points="50,10 54,13 53,18 47,18 46,13" fill="#333" stroke="#333" stroke-width="0.5"/>
-  <line x1="50" y1="10" x2="50" y2="7" stroke="#999" stroke-width="1.5"/>
+  <!-- Trionda-style ball on top (World Cup 2026) -->
+  <g clip-path="url(#ballClip)">
+    <!-- Base circle -->
+    <circle cx="50" cy="18" r="13" fill="#ffffff" stroke="#999" stroke-width="1"/>
+    <!-- Red wave (Canada) -->
+    <path d="M38 8 Q43 14 40 22 Q37 28 42 31 L48 28 Q44 22 47 14 Q50 8 48 5Z" fill="#e63946"/>
+    <!-- Green wave (Mexico) -->
+    <path d="M48 5 Q50 10 54 6 L58 10 Q55 14 57 20 L51 22 Q50 16 48 12Z" fill="#2d6a4f"/>
+    <!-- Blue wave (USA) -->
+    <path d="M56 8 Q60 12 62 8 L65 14 Q62 18 63 24 L57 26 Q55 22 53 15Z" fill="#1d3557"/>
+    <!-- Gold accent ring -->
+    <circle cx="50" cy="18" r="11" fill="none" stroke="#d4af37" stroke-width="1.2"/>
+    <!-- Center triangle (unity) -->
+    <polygon points="50,11 54,16 46,16" fill="#d4af37" opacity="0.8"/>
+    <!-- Small stars (USA) -->
+    <polygon points="56,10 57,11 58,10 57.5,12 58.5,12 57.5,13 58,14 57,13 56,14 56.5,13 55.5,12 56.5,12" fill="#ffffff" opacity="0.7"/>
+    <polygon points="40,20 40.7,20.5 41,20 40.8,21 41.3,21 40.8,22 41,23 40.3,22 39.5,23 40,22 39.5,21 40,21" fill="#ffffff" opacity="0.7"/>
+    <!-- Maple leaf hint (Canada) -->
+    <path d="M42 12 L43 10 L44 12 L45 11 L44 13 L46 14 L44 14 L44 16 L43 15 L42 16 L42 14 L40 14 L42 13 L41 11Z" fill="#ffffff" opacity="0.5"/>
+  </g>
 </svg>
