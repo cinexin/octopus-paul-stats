@@ -35,6 +35,69 @@ python -m main "Argentina" "Brasil"
 python -m main "Francia" "Inglaterra" 10
 ```
 
+## API REST
+
+El proyecto incluye una API REST construida con **FastAPI** con documentación Swagger interactiva.
+
+### Arrancar el servidor
+
+```bash
+pip install -r requirements.txt
+uvicorn application.api:app --reload
+```
+
+### Endpoint
+
+| Método | Ruta    | Parámetros                                                            | Descripción                                          |
+|--------|---------|-----------------------------------------------------------------------|------------------------------------------------------|
+| GET    | `/stats`| `local` (requerido), `visitor` (requerido), `n_matches` (opcional, default 5) | Estadísticas y probabilidades para dos equipos       |
+
+### Ejemplos con curl
+
+```bash
+curl "http://localhost:8000/stats?local=spain&visitor=france"
+
+curl "http://localhost:8000/stats?local=españa&visitor=inglaterra&n_matches=10"
+```
+
+### Documentación interactiva (Swagger)
+
+Una vez arrancado el servidor, abre en el navegador:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **OpenAPI JSON**: http://localhost:8000/openapi.json
+
+### Respuesta (JSON)
+
+```json
+{
+  "local_team": "spain",
+  "visitor_team": "france",
+  "local_team_stats": {
+    "avg_goals": 1.8,
+    "avg_conceded": 0.0,
+    "n_matches": 5,
+    "matches": [...],
+    "h2h_avg_goals": 1.5
+  },
+  "visitor_team_stats": {...},
+  "h2h_matches": [...],
+  "probabilities": {
+    "team1_win_90": 0.42,
+    "draw_90": 0.38,
+    "team2_win_90": 0.20,
+    "team1_win_et": 0.08,
+    "team2_win_et": 0.08,
+    "team1_win_pen": 0.13,
+    "team2_win_pen": 0.10,
+    "team1_total": 0.62,
+    "team2_total": 0.38,
+    "exp_t1": 0.85,
+    "exp_t2": 0.49
+  }
+}
+```
+
 ### Parámetros
 
 | Parámetro     | Descripción                                      | Default       |
@@ -100,7 +163,7 @@ octopus-paul-stats "Argentina" "Brasil"
 
 ## Estructura del proyecto
 
-Sigue el patrón **Domain-Driven Design (DDD)** con **inyección de dependencias** (`dependency-injector`):
+Sigue el patrón **Domain-Driven Design (DDD)** con **inyección de dependencias** (`injection`):
 
 ```
 octopus-paul-stats/
@@ -124,6 +187,8 @@ octopus-paul-stats/
 │   └── betexplorer_repository.py          # BetExplorerRepository (scraping puro)
 │
 ├── application/
+│   ├── api.py                             # API REST (FastAPI): endpoint /stats
+│   ├── schemas.py                         # Pydantic models para la API
 │   ├── constants.py                       # Constantes de presentación/CLI
 │   ├── container.py                       # Contenedor DI (AppContainer con providers)
 │   └── cli.py                             # Orquestación: fetch → compute H2H → probabilities → display
@@ -139,8 +204,9 @@ octopus-paul-stats/
     │   ├── test_betexplorer_repository.py # Repositorio scraping + resolve_team_name
     │   └── test_cli.py                    # compute_h2h, print*, main()
     ├── integration/
-    │   ├── test_repository_service_integration.py  # Repo + TeamStatsService
-    │   └── test_full_stats_flow.py                 # TeamStatsService + PoissonStatsService
+    │   ├── test_api.py                               # API REST (FastAPI)
+    │   ├── test_repository_service_integration.py    # Repo + TeamStatsService
+    │   └── test_full_stats_flow.py                   # TeamStatsService + PoissonStatsService
     └── e2e/
         └── test_full_pipeline.py          # CLI completo: args → stats → probabilidades
 ```
@@ -164,4 +230,4 @@ Cada servicio del dominio sigue el patrón **interfaz + implementación**:
 
 `BetExplorerTeamStatsService` inyecta `BetExplorerRepository` (infrastructure) para scrapear datos.
 
-`main.py` crea `AppContainer`, lo wirea al módulo `application.cli`, y ejecuta `main()`, que recibe ambos servicios inyectados vía `@inject` / `Provide`.
+`main.py` llama a `main()` con los servicios inyectados vía `@inject` / `Provide` de la librería `injection`.
