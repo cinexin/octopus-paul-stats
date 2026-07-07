@@ -1,10 +1,12 @@
 import logging
 import re
+from datetime import datetime
 
 import requests
 from bs4 import BeautifulSoup
 
 from domain.models.match_result import MatchResult
+from infrastructure.cache import cache, cache_key, is_cache_fresh
 from infrastructure.constants import HEADERS, BASE_URL, WC_RESULTS_URL, TEAM_TRANSLATIONS
 from utils import normalize
 
@@ -111,9 +113,7 @@ class BetExplorerRepository:
 
         return None
 
-    def get_team_matches(self, team_url, tournament_filter='Final tournament'):
-        soup = self._soup(f'{BASE_URL}{team_url}results/')
-
+    def _parse_team_matches(self, soup, tournament_filter):
         matches = []
         current_tournament = None
 
@@ -173,5 +173,48 @@ class BetExplorerRepository:
                 detail_url=detail_link,
                 tournament=current_tournament,
             ))
+
+        return matches
+
+    def _match_to_dict(self, m):
+        return {
+            'home_team': m.home_team,
+            'away_team': m.away_team,
+            'home_goals': m.home_goals,
+            'away_goals': m.away_goals,
+            'date_str': m.date_str,
+            'round_name': m.round_name,
+            'detail_url': m.detail_url,
+            'tournament': m.tournament,
+        }
+
+    @staticmethod
+    def _match_from_dict(d):
+        return MatchResult(
+            home_team=d['home_team'],
+            away_team=d['away_team'],
+            home_goals=d['home_goals'],
+            away_goals=d['away_goals'],
+            date_str=d['date_str'],
+            round_name=d['round_name'],
+            detail_url=d['detail_url'],
+            tournament=d['tournament'],
+        )
+
+    def get_team_matches(self, team_url, tournament_filter='Final tournament'):
+        ck = cache_key(team_url, tournament_filter)
+        cached = cache.get(ck)
+        if cached is not None and is_cache_fresh(cached):
+            logger.info('Cache hit for %s', ck)
+            return [self._match_from_dict(m) for m in cached['matches']]
+
+        logger.info('Cache miss or stale for %s, fetching...', ck)
+        soup = self._soup(f'{BASE_URL}{team_url}results/')
+        matches = self._parse_team_matches(soup, tournament_filter)
+
+        cache.set(ck, {
+            'matches': [self._match_to_dict(m) for m in matches],
+            'cached_at': datetime.now().isoformat(),
+        })
 
         return matches
